@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import './questions.dart';
-import './answer.dart';
+import './quiz.dart';
+import './result.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,23 +13,48 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final questions = const [
+  final _questions = const [
     {
       'questiontext': 'what\'s your fav color?',
-      'answers': ['Black', 'Red', 'White', 'Green'],
+      'answers': [
+        {'text': 'Black', 'score': 10},
+        {'text': 'Red', 'score': 5},
+        {'text': 'White', 'score': 2},
+        {'text': 'Green', 'score': 1},
+      ],
     },
     {
       'questiontext': 'what\'s your fav animal?',
-      'answers': ['RAt', 'Rabbit', 'Lion', 'Tiger'],
+      'answers': [
+        {'text': 'Tiger', 'score': 10},
+        {'text': 'Elephant', 'score': 5},
+        {'text': 'Lion', 'score': 2},
+        {'text': 'Pig', 'score': 1},
+      ],
     },
     {
       'questiontext': 'what\'s your fav ice-cream',
-      'answers': ['Tootifooti', 'Mango', 'Chocolate', 'Vanilla'],
+      'answers': [
+        {'text': 'Vanilla', 'score': 10},
+        {'text': 'Tooti-Footi', 'score': 5},
+        {'text': 'Chocolate', 'score': 2},
+        {'text': 'Orange', 'score': 1},
+      ],
     },
   ];
   var _questionindex = 0;
+  var _totalscore = 0;
+  void _resetQuiz() {
+    setState(() {
+      _questionindex = 0;
+      _totalscore = 0;
+    });
+  }
+
   @override
-  void _answers() {
+  // ignore: override_on_non_overriding_member
+  void _answersQuestion(int score) {
+    _totalscore += score;
     //setstate is a fn used to rerender the interface or it call build again
 
     setState(() {
@@ -37,9 +62,6 @@ class _MyAppState extends State<MyApp> {
       _questionindex = _questionindex + 1;
     });
     print(_questionindex);
-    if (_questionindex < questions.length) {
-      print('We have more questions..');
-    }
   }
 
   @override
@@ -49,25 +71,13 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Text('Myappp bar'),
         ),
-        body: _questionindex < questions.length
-            ? Column(
-                children: [
-                  Questions(
-                    //as sting addded due to error
-                    questions[_questionindex]['questiontext'] as String,
-                  ),
-                  //accessing the widgets without hardcoding it
-                  //here accessing list of widgets by mapping
-                  ...(questions[_questionindex]['answers'] as List<String>)
-                      //acessing the questions with key['answers'] with list of stings
-                      .map((answer) {
-                    return Answers(_answers, answer);
-                  }).toList() //convert value of map to list
-                ],
+        body: _questionindex < _questions.length
+            ? Quiz(
+                answersQuestion: _answersQuestion,
+                questionindex: _questionindex,
+                questions: _questions,
               )
-            : Center(
-                child: Text('U did it'),
-              ),
+            : Result(_totalscore, _resetQuiz),
       ),
     );
   }
